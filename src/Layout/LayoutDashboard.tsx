@@ -3,7 +3,7 @@ import NavBar from "./components/NavBar";
 import { useState } from "react";
 
 const LayoutDashBoard = () => {
-  const [title, setTitle] = useState("Title");
+  const [title, setTitle] = useState(null);
   return (
     <div className="layout flex flex-col min-h-screen">
       <NavBar className="header" title={title} />

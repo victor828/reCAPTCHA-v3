@@ -1,8 +1,32 @@
 import image from "@assets/lofi-girl-reading-hip-hop-chillhop-uhdpaper.com-4K-7.2707.jpg";
 import CustomForm from "@components/CustomForm";
 import { Link } from "react-router-dom";
+import Recaptcha from "@components/Recaptcha.jsx";
+import { useNavigate } from "react-router-dom";
+import { registerFuncs } from "./index";
+import { useContext } from "react";
+import { UsersContext } from "../../../context/useContextUsers";
 
 export function Register() {
+  const navigate = useNavigate();
+  const { users, registerUser } = useContext(UsersContext);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const response = await registerFuncs.registerAction({
+      formData,
+    });
+
+    if (response.success) {
+      registerUser(response.user);
+      navigate("/");
+    } else {
+      alert("Error en la verificación de reCAPTCHA");
+    }
+  };
+
   return (
     <section className="bg-white">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
@@ -40,21 +64,26 @@ export function Register() {
               nam dolorum aliquam, quibusdam aperiam voluptatum.
             </p>
 
-            <form className="mt-8 grid grid-cols-6 gap-6">
-              <CustomForm label="First Name" name="first_name" />
-
-              <CustomForm label="Last Name" name="last_name" />
-
-              <CustomForm label="Email" name="email" type="email" />
-
-              <CustomForm label="Password" name="password" type="password" />
-
+            <form
+              className="mt-8 grid grid-cols-6 gap-6"
+              onSubmit={handleSubmit}
+            >
+              <Recaptcha path="register" />
+              <CustomForm label="First Name" name="first_name" required />
+              <CustomForm label="Last Name" name="last_name" required />
+              <CustomForm label="Email" name="email" type="email" required />
+              <CustomForm
+                label="Password"
+                name="password"
+                type="password"
+                required
+              />
               <CustomForm
                 label="Password Confirmation"
                 name="password_confirmation"
                 type="password"
+                required
               />
-
               <div className="col-span-6">
                 <label htmlFor="MarketingAccept" className="flex gap-4">
                   <input
@@ -62,15 +91,14 @@ export function Register() {
                     id="MarketingAccept"
                     name="marketing_accept"
                     className="size-5 rounded-md border-gray-200 bg-white shadow-sm"
+                    required
                   />
-
                   <span className="text-sm text-gray-700">
                     I want to receive emails about events, product updates and
                     company announcements.
                   </span>
                 </label>
               </div>
-
               <div className="col-span-6">
                 <p className="text-sm text-gray-500">
                   By creating an account, you agree to our
@@ -84,7 +112,6 @@ export function Register() {
                   .
                 </p>
               </div>
-
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                 <button
                   type="submit"
@@ -92,11 +119,10 @@ export function Register() {
                 >
                   Create an account
                 </button>
-
                 <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                   Already have an account?
                   <Link
-                    to="/login"
+                    to="/auth/login"
                     replace={true}
                     className="text-gray-700 underline"
                   >

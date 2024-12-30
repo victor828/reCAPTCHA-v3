@@ -1,10 +1,25 @@
+import { useState } from "react";
 import image from "@assets/lofi-girl-reading-hip-hop-chillhop-uhdpaper.com-4K-7.2707.jpg";
 import CustomForm from "@components/CustomForm.tsx";
 import Recaptcha from "@components/Recaptcha.jsx";
-
-import { Link } from "react-router-dom";
+import { loginAction } from "./index";
+import { Link, useNavigate } from "react-router-dom";
 
 export function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const result = await loginAction();
+    if (!result.success) {
+      alert(result.error);
+      return;
+    }
+    navigate("/");
+  };
+
   return (
     <section className="bg-white">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
@@ -42,17 +57,28 @@ export function Login() {
               nam dolorum aliquam, quibusdam aperiam voluptatum.
             </p>
 
-            <form action="#" className="mt-8 grid grid-cols-6 gap-6">
-              <Recaptcha />
+            <form
+              onSubmit={handleSubmit}
+              className="mt-8 grid grid-cols-6 gap-6"
+            >
+              <Recaptcha path="login" />
               <div className="grid gap-6 col-span-6 sm:col-span-3">
                 <CustomForm
                   label="Email"
                   name="email"
                   type="email"
                   className="w-full"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
 
-                <CustomForm label="Password" name="password" type="password" />
+                <CustomForm
+                  label="Password"
+                  name="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
 
               <div className="col-span-6">
@@ -77,7 +103,7 @@ export function Login() {
                 <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                   Already have an account?&nbsp;
                   <Link
-                    to="/register"
+                    to="/auth/register"
                     replace={true}
                     className="text-gray-700 underline"
                   >

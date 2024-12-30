@@ -1,13 +1,25 @@
+import { useContext } from "react";
+import { Link } from "react-router-dom";
+import { UsersContext } from "../../context/useContextUsers";
+
 interface NavBarProps {
   className?: string;
-  title: string;
+  title?: string;
 }
 
 const NavBar = (props: NavBarProps) => {
+  const context = useContext(UsersContext);
+  if (!context) {
+    throw new Error("UsersContext must be used within a UsersProvider");
+  }
+  const { user as User } = context;
+
   return (
     <div className={`navbar bg-base-100 ${props.className}`}>
       <div className="flex-1">
-        <a className="btn btn-ghost text-xl">{props.title}</a>
+        <a className="btn btn-ghost text-xl">
+          {props.title || user.first_name}
+        </a>
       </div>
       <div className="flex-none gap-2">
         <div className="form-control">
@@ -35,16 +47,16 @@ const NavBar = (props: NavBarProps) => {
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a className="justify-between">
+              <Link to="#" className="justify-between">
                 Profile
                 <span className="badge">New</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a>Settings</a>
+              <Link to="#">Settings</Link>
             </li>
             <li>
-              <a>Logout</a>
+              <Link to="/auth/login">Logout</Link>
             </li>
           </ul>
         </div>
