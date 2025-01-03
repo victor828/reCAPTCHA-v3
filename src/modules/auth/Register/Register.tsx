@@ -44,7 +44,7 @@ export function Register() {
 
     const recaptchaData: RecaptchaResponse = await recaptchaService();
     if (!recaptchaData.success) {
-      alert("reCAPTCHA verification failed");
+      alert("reCAPTCHA verification failed, press the button to recharge");
       setnewCaptcha((prev) => prev + 1);
       return;
     }
