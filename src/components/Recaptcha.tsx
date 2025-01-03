@@ -4,7 +4,7 @@ import { recaptchaSiteKey } from "../variables";
 
 interface RecaptchaProps {
   path: string;
-  dependencys?: string[];
+  dependencys?: React.DependencyList;
 }
 
 const Recaptcha = (props: RecaptchaProps) => {
@@ -20,7 +20,7 @@ const Recaptcha = (props: RecaptchaProps) => {
     });
   }, [props.dependencys]);
 
-  return <input type='hidden' name='recaptchaToken' value={recaptchaToken} />;
+  return <input type="hidden" name="recaptchaToken" value={recaptchaToken} />;
 };
 
 export default Recaptcha;

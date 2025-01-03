@@ -1,29 +1,69 @@
 import image from "@assets/lofi-girl-reading-hip-hop-chillhop-uhdpaper.com-4K-7.2707.jpg";
-import CustomForm from "@components/CustomForm";
 import { Link } from "react-router-dom";
-import Recaptcha from "@components/Recaptcha.jsx";
 import { useNavigate } from "react-router-dom";
-import { registerFuncs } from "./index";
-import { useContext } from "react";
-import { UsersContext } from "../../../context/useContextUsers";
+// import { useContext } from "react";
+// import { UsersContext } from "../../../context/useContextUsers";
+import Recaptcha from "../../../components/Recaptcha";
+import CustomForm from "../../../components/CustomForm";
+import CustopCheckBox from "../../../components/CustopCheckBox";
+import { urlBase } from "../../../variables";
+import { useState } from "react";
+import { recaptchaService } from "@/service/recaptcha.service";
 
 export function Register() {
   const navigate = useNavigate();
-  const { users, registerUser } = useContext(UsersContext);
+  const [newCaptcha, setnewCaptcha] = useState(0);
 
-  const handleSubmit = async (event) => {
+  interface FormElements extends HTMLFormControlsCollection {
+    name: HTMLInputElement;
+    email: HTMLInputElement;
+    password: HTMLInputElement;
+    password_confirmation: HTMLInputElement;
+    born_day: HTMLInputElement;
+    email_updates: HTMLInputElement;
+    terms: HTMLInputElement;
+  }
+
+  interface RegisterForm extends HTMLFormElement {
+    elements: FormElements;
+  }
+
+  interface RecaptchaResponse {
+    success: boolean;
+    message?: string;
+  }
+
+  const handleSubmit = async (event: React.FormEvent<RegisterForm>) => {
     event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-    const response = await registerFuncs.registerAction({
-      formData,
+    const form = event.currentTarget.elements;
+
+    if (form.password.value !== form.password_confirmation.value) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    const recaptchaData: RecaptchaResponse = await recaptchaService();
+    if (!recaptchaData.success) {
+      alert("reCAPTCHA verification failed");
+      setnewCaptcha((prev) => prev + 1);
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
+    const response = await fetch(urlBase + "auth/register", {
+      method: "POST",
+      body: formData,
     });
 
-    if (response.success) {
-      registerUser(response.user);
+    const result = await response.json();
+    if (result.success) {
       navigate("/");
     } else {
-      alert("Error en la verificación de reCAPTCHA");
+      alert(
+        `${result.message || "Error en la verificación de reCAPTCHA"}\n\n` +
+          "Por favor, recargue la página y vuelva a intentarlo."
+      );
+      setnewCaptcha((prev) => prev + 1);
     }
   };
 
@@ -65,13 +105,16 @@ export function Register() {
             </p>
 
             <form
-              className="mt-8 grid grid-cols-6 gap-6"
               onSubmit={handleSubmit}
+              // method="POST"
+              // action="/api/register"
+              // encType="multipart/form-data"
+              className="mt-8 grid grid-cols-6 gap-6"
             >
-              <Recaptcha path="register" />
-              <CustomForm label="First Name" name="first_name" required />
-              <CustomForm label="Last Name" name="last_name" required />
+              <Recaptcha path="register" dependencys={[newCaptcha]} />
+              <CustomForm label="Name" name="name" required />
               <CustomForm label="Email" name="email" type="email" required />
+
               <CustomForm
                 label="Password"
                 name="password"
@@ -84,21 +127,24 @@ export function Register() {
                 type="password"
                 required
               />
-              <div className="col-span-6">
-                <label htmlFor="MarketingAccept" className="flex gap-4">
-                  <input
-                    type="checkbox"
-                    id="MarketingAccept"
-                    name="marketing_accept"
-                    className="size-5 rounded-md border-gray-200 bg-white shadow-sm"
-                    required
-                  />
-                  <span className="text-sm text-gray-700">
-                    I want to receive emails about events, product updates and
-                    company announcements.
-                  </span>
-                </label>
-              </div>
+              <CustomForm
+                label="Born Day"
+                name="born_day"
+                type="date"
+                required
+              />
+              <CustopCheckBox
+                label="I want to receive emails about events, product updates and
+                  company announcements."
+                name="email_updates"
+                id="email_updates"
+              />
+              <CustopCheckBox
+                required
+                label="I read & I accept the terms & conditions."
+                name="terms"
+                id="terms"
+              />
               <div className="col-span-6">
                 <p className="text-sm text-gray-500">
                   By creating an account, you agree to our
@@ -117,7 +163,7 @@ export function Register() {
                   type="submit"
                   className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
                 >
-                  Create an account
+                  Register
                 </button>
                 <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                   Already have an account?

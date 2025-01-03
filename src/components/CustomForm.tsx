@@ -1,6 +1,6 @@
 interface CustomFormProps {
   name: string;
-  type: string;
+  type?: string | "text";
   label: string;
   className?: string;
   otherProps?: React.InputHTMLAttributes<HTMLInputElement>;
@@ -23,7 +23,7 @@ const CustomForm = (props: CustomFormProps) => {
         id={props.name}
         name={props.name}
         required={props.required}
-        className="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
+        className="px-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
       />
     </div>
   );

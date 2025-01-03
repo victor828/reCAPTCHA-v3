@@ -12,13 +12,13 @@ const NavBar = (props: NavBarProps) => {
   if (!context) {
     throw new Error("UsersContext must be used within a UsersProvider");
   }
-  const { user as User } = context;
+  const { user } = context;
 
   return (
     <div className={`navbar bg-base-100 ${props.className}`}>
       <div className="flex-1">
         <a className="btn btn-ghost text-xl">
-          {props.title || user.first_name}
+          {props.title || user?.first_name}
         </a>
       </div>
       <div className="flex-none gap-2">
