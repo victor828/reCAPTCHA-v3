@@ -5,6 +5,8 @@ interface CustomFormProps {
   className?: string;
   otherProps?: React.InputHTMLAttributes<HTMLInputElement>;
   required?: boolean;
+  value: string;
+  onchange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const CustomForm = (props: CustomFormProps) => {
@@ -19,6 +21,8 @@ const CustomForm = (props: CustomFormProps) => {
 
       <input
         {...props.otherProps}
+        onChange={props.onchange}
+        value={props.value}
         type={props.type}
         id={props.name}
         name={props.name}
