@@ -1,22 +1,17 @@
 import { useState } from "react";
 import image from "@assets/lofi-girl-reading-hip-hop-chillhop-uhdpaper.com-4K-7.2707.jpg";
-import CustomForm from "@components/CustomForm.tsx";
-import Recaptcha from "@components/Recaptcha.jsx";
-import { loginAction } from "./index";
 import { Link, useNavigate } from "react-router-dom";
+import Recaptcha from "../../../components/Recaptcha";
+import CustomForm from "../../../components/CustomForm";
 
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const result = await loginAction();
-    if (!result.success) {
-      alert(result.error);
-      return;
-    }
+
     navigate("/");
   };
 
@@ -69,7 +64,7 @@ export function Login() {
                   type="email"
                   className="w-full"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onchange={(e) => setEmail(e.target.value)}
                 />
 
                 <CustomForm
@@ -77,7 +72,7 @@ export function Login() {
                   name="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onchange={(e) => setPassword(e.target.value)}
                 />
               </div>
 
