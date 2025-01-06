@@ -1,43 +1,44 @@
 import image from "@assets/lofi-girl-reading-hip-hop-chillhop-uhdpaper.com-4K-7.2707.jpg";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-// import { useContext } from "react";
-// import { UsersContext } from "../../../context/useContextUsers";
 import Recaptcha from "../../../components/Recaptcha";
 import CustomForm from "../../../components/CustomForm";
 import CustopCheckBox from "../../../components/CustopCheckBox";
 import { urlBase } from "../../../variables";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { recaptchaService } from "@/service/recaptcha.service";
+import { UsersContext } from "../../../context/useContextUsers";
 
+interface FormElements extends HTMLFormControlsCollection {
+  name: HTMLInputElement;
+  email: HTMLInputElement;
+  password: HTMLInputElement;
+  password_confirmation: HTMLInputElement;
+  born_day: HTMLInputElement;
+  email_updates: HTMLInputElement;
+  terms: HTMLInputElement;
+}
+
+interface RegisterForm extends HTMLFormElement {
+  elements: FormElements;
+}
+
+interface RecaptchaResponse {
+  success: boolean;
+  message?: string;
+}
 export function Register() {
   const navigate = useNavigate();
   const [newCaptcha, setnewCaptcha] = useState(0);
+  const { setUser, user } = useContext<any>(UsersContext);
 
-  interface FormElements extends HTMLFormControlsCollection {
-    name: HTMLInputElement;
-    email: HTMLInputElement;
-    password: HTMLInputElement;
-    password_confirmation: HTMLInputElement;
-    born_day: HTMLInputElement;
-    email_updates: HTMLInputElement;
-    terms: HTMLInputElement;
-  }
-
-  interface RegisterForm extends HTMLFormElement {
-    elements: FormElements;
-  }
-
-  interface RecaptchaResponse {
-    success: boolean;
-    message?: string;
-  }
-
-  const handleSubmit = async (event: React.FormEvent<RegisterForm>) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const form = event.currentTarget.elements;
+    const form = event.currentTarget as RegisterForm;
 
-    if (form.password.value !== form.password_confirmation.value) {
+    if (
+      form.elements.password.value !== form.elements.password_confirmation.value
+    ) {
       alert("Passwords do not match");
       return;
     }
@@ -49,10 +50,9 @@ export function Register() {
       return;
     }
 
-    const formData = new FormData(event.currentTarget);
     const response = await fetch(urlBase + "auth/register", {
       method: "POST",
-      body: formData,
+      body: JSON.stringify(user),
     });
 
     const result = await response.json();
@@ -65,6 +65,14 @@ export function Register() {
       );
       setnewCaptcha((prev) => prev + 1);
     }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setUser((prevUser) => ({
+      ...prevUser,
+      [name]: value,
+    }));
   };
 
   return (
@@ -94,11 +102,9 @@ export function Register() {
                 />
               </svg>
             </a>
-
             <h1 className="mt-6 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
               Register with Squid 🦑
             </h1>
-
             <p className="mt-4 leading-relaxed text-gray-500">
               Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi
               nam dolorum aliquam, quibusdam aperiam voluptatum.
@@ -106,30 +112,46 @@ export function Register() {
 
             <form
               onSubmit={handleSubmit}
-              // method="POST"
-              // action="/api/register"
-              // encType="multipart/form-data"
               className="mt-8 grid grid-cols-6 gap-6"
             >
               <Recaptcha path="register" dependencys={[newCaptcha]} />
-              <CustomForm label="Name" name="name" required />
-              <CustomForm label="Email" name="email" type="email" required />
-
               <CustomForm
-                label="Password"
-                name="password"
-                type="password"
+                onchange={handleInputChange}
+                value={user.name}
+                label="Name"
+                name="nombre"
                 required
               />
               <CustomForm
+                onchange={handleInputChange}
+                value={user.email}
+                label="Email"
+                name="correo"
+                type="email"
+                required
+              />
+
+              <CustomForm
+                onchange={handleInputChange}
+                label="Password"
+                name="password"
+                type="password"
+                value={user?.password}
+                required
+              />
+              <CustomForm
+                onchange={handleInputChange}
+                value={user?.password_confirmation}
                 label="Password Confirmation"
                 name="password_confirmation"
                 type="password"
                 required
               />
               <CustomForm
+                onchange={handleInputChange}
+                value={user?.born_day}
                 label="Born Day"
-                name="born_day"
+                name="fecha_nacimiento"
                 type="date"
                 required
               />
