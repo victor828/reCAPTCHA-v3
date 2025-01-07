@@ -8,7 +8,17 @@ interface User {
   password: string;
 }
 
-export const UsersContext = createContext();
+interface UserContextType {
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}
+
+const defaultUserContext = {
+  user: null,
+  setUser: () => {},
+};
+
+export const UsersContext = createContext(defaultUserContext);
 
 import { ReactNode } from "react";
 
@@ -18,13 +28,7 @@ interface UsersProviderProps {
 
 export const UsersProvider = ({ children }: UsersProviderProps) => {
   const [users, setUsers] = useState<User[]>([]);
-  const [user, setUser] = useState<User | null>({
-    id: 0,
-    nombre: "",
-    correo: "",
-    fecha_nacimiento: new Date(),
-    password: "",
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   return (
     <UsersContext.Provider value={{ users, user, setUsers, setUser }}>
