@@ -1,27 +1,47 @@
 import { urlBase } from "../variables";
 
-export const recaptchaService = async (params = {}, registerUser) => {
+export const recaptchaService = async (params = {}) => {
   const { timeout = 120000 } = params;
-  const values = sessionStorage.getItem("recapchaToken");
+  const token = sessionStorage.getItem("recapchaToken");
 
-  if (!values) return { success: false };
-  const recaptchaResponse = await fetch(urlBase + "api/recaptcha", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ token: values }),
-    timeout: timeout,
-  });
+  if (!token) return { success: false };
 
-  const data = await recaptchaResponse.json();
+  try {
+    const recaptchaResponse = await fetch(urlBase + "api/recaptcha", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token }),
+      timeout: timeout,
+    });
 
-  if (data.success && registerUser) {
-    const newUser = {
-      /* datos del nuevo usuario */
-    };
-    registerUser(newUser); // Registrar el nuevo usuario
+    const data = await recaptchaResponse.json();
+
+    if (!data.success) {
+      return { success: false };
+    }
+
+    const { score, strongerRecaptcha } = data;
+
+    if (strongerRecaptcha) {
+      // Cambiar a un tipo de reCAPTCHA más fuerte
+      return { success: true, strongerRecaptcha: true };
+    }
+
+    if (score >= 0.5) {
+      // Puntuación suficiente para pasar la verificación
+      return { success: true };
+    } else {
+      // Manejar puntuaciones bajas (posibles bots)
+      return {
+        success: false,
+        message: "Verificación adicional requerida",
+        activateSecurity: true,
+      };
+    }
+  } catch (error) {
+    console.error("Error en la verificación de reCAPTCHA:", error);
+    return { success: false, message: "Error en la verificación de reCAPTCHA" };
   }
-
-  return data;
 };
