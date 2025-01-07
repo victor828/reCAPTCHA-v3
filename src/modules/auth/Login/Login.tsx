@@ -14,8 +14,8 @@ interface RecaptchaResponse {
 export function Login() {
   const navigate = useNavigate();
   const [requestData, setrequestData] = useState({
-    correo: "user3@mail.com",
-    password: "Gato777.",
+    correo: "",
+    password: "",
   });
   const { setUser } = useContext(UsersContext);
 
