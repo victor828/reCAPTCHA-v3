@@ -1,11 +1,11 @@
 import { createContext, useState } from "react";
 
 interface User {
-  id?: number;
-  nombre: string;
-  correo: string;
-  fecha_nacimiento: Date;
-  password: string;
+  name: string;
+
+  email: string;
+
+  [key: string]: string | number | boolean;
 }
 
 interface UserContextType {
