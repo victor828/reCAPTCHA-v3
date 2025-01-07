@@ -41,16 +41,19 @@ export function Login() {
       body: JSON.stringify(requestData),
     });
 
-    const result = await response.json();
+    const result: {
+      token?: string;
+      user?: {
+        name: string;
+        email: string;
+      };
+      message?: string;
+    } = await response.json();
+    console.log(result);
 
-    if (result.token.token) {
-      localStorage.setItem("token", result.token.token);
-      setUser((pre) => ({
-        ...pre,
-        name: result.token.user.name,
-        email: result.token.user.email,
-        ...result.token.user,
-      }));
+    if (result.token) {
+      localStorage.setItem("token", result.token);
+      setUser(result.user);
       navigate("/");
     } else {
       alert(
