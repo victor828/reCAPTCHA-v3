@@ -1,18 +1,71 @@
-import { useState } from "react";
+import React, { useContext, useState } from "react";
 import image from "@assets/lofi-girl-reading-hip-hop-chillhop-uhdpaper.com-4K-7.2707.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import Recaptcha from "../../../components/Recaptcha";
 import CustomForm from "../../../components/CustomForm";
+import { recaptchaService } from "@/service/recaptcha.service";
+import { urlBase } from "../../../variables";
+import { UsersContext } from "../../../context/useContextUsers";
+interface RecaptchaResponse {
+  success: boolean;
+  message?: string;
+}
 
 export function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [requestData, setrequestData] = useState({
+    correo: "user3@mail.com",
+    password: "Gato777.",
+  });
+  const { setUser } = useContext(UsersContext);
 
+  const [recaptcha, setrecaptcha] = useState(0);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    navigate("/");
+    const recaptchaData: RecaptchaResponse = await recaptchaService();
+    if (!recaptchaData.success) {
+      if (
+        window.confirm("reCAPTCHA verification failed, press OK to recharge")
+      ) {
+        setrecaptcha(recaptcha + 1);
+      }
+      return;
+    }
+
+    const response = await fetch(urlBase + "auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData),
+    });
+
+    const result = await response.json();
+
+    if (result.token.token) {
+      localStorage.setItem("token", result.token.token);
+      setUser((pre) => ({
+        ...pre,
+        name: result.token.user.name,
+        email: result.token.user.email,
+        ...result.token.user,
+      }));
+      navigate("/");
+    } else {
+      alert(
+        `${result.message || "Error en la verificación de reCAPTCHA"}\n\n` +
+          "Por favor, recargue la página y vuelva a intentarlo."
+      );
+    }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setrequestData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   return (
@@ -56,23 +109,27 @@ export function Login() {
               onSubmit={handleSubmit}
               className="mt-8 grid grid-cols-6 gap-6"
             >
-              <Recaptcha path="login" />
+              <Recaptcha
+                path="login"
+                expiration={0.5}
+                dependencys={[recaptcha]}
+              />
               <div className="grid gap-6 col-span-6 sm:col-span-3">
                 <CustomForm
                   label="Email"
-                  name="email"
+                  name="correo"
                   type="email"
                   className="w-full"
-                  value={email}
-                  onchange={(e) => setEmail(e.target.value)}
+                  onchange={handleInputChange}
+                  required
                 />
 
                 <CustomForm
                   label="Password"
                   name="password"
                   type="password"
-                  value={password}
-                  onchange={(e) => setPassword(e.target.value)}
+                  onchange={handleInputChange}
+                  required
                 />
               </div>
 
@@ -91,7 +148,10 @@ export function Login() {
               </div>
 
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                <button className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500">
+                <button
+                  type="submit"
+                  className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
+                >
                   Login
                 </button>
 
