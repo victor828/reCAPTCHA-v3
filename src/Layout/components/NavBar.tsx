@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { UsersContext } from "../../context/useContextUsers";
 
 interface NavBarProps {
@@ -9,10 +9,16 @@ interface NavBarProps {
 
 const NavBar = (props: NavBarProps) => {
   const context = useContext(UsersContext);
+  const navigate = useNavigate();
   if (!context) {
     throw new Error("UsersContext must be used within a UsersProvider");
   }
   const { user } = context;
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/auth/login");
+  };
 
   return (
     <div className={`navbar bg-base-100 ${props.className}`}>
@@ -56,7 +62,7 @@ const NavBar = (props: NavBarProps) => {
               <Link to="#">Settings</Link>
             </li>
             <li>
-              <Link to="/auth/login">Logout</Link>
+              <a onClick={handleLogout}>Logout</a>
             </li>
           </ul>
         </div>
