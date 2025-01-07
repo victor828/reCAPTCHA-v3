@@ -1,26 +1,51 @@
 import { load } from "recaptcha-v3";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { recaptchaSiteKey } from "../variables";
 
 interface RecaptchaProps {
   path: string;
   dependencys?: React.DependencyList;
+  expiration?: number;
 }
 
-const Recaptcha = (props: RecaptchaProps) => {
+const Recaptcha = ({
+  path,
+  dependencys = [],
+  expiration = 2,
+}: RecaptchaProps) => {
   const [recaptchaToken, setRecaptchaToken] = useState("");
+  const [tokenExpiration, setTokenExpiration] = useState<NodeJS.Timeout | null>(
+    null
+  );
 
   sessionStorage.setItem("recapchaToken", recaptchaToken);
 
   useEffect(() => {
-    load(recaptchaSiteKey).then((recaptcha) => {
-      recaptcha.execute(props.path).then((token) => {
-        setRecaptchaToken(token);
+    const fetchToken = () => {
+      load(recaptchaSiteKey).then((recaptcha) => {
+        recaptcha.execute(path).then((token) => {
+          setRecaptchaToken(token);
+          if (tokenExpiration) {
+            clearTimeout(tokenExpiration);
+          }
+          const expirationTimeout = setTimeout(() => {
+            setRecaptchaToken("");
+          }, expiration * 60 * 1000); // Token expira en 2 minutos por default
+          setTokenExpiration(expirationTimeout);
+        });
       });
-    });
-  }, [props.dependencys]);
+    };
+
+    fetchToken();
+
+    return () => {
+      if (tokenExpiration) {
+        clearTimeout(tokenExpiration);
+      }
+    };
+  }, [path, ...dependencys]);
 
   return <input type="hidden" name="recaptchaToken" value={recaptchaToken} />;
 };
 
-export default Recaptcha;
+export default memo(Recaptcha);
