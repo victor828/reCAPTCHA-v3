@@ -6,7 +6,7 @@ const LayoutDashBoard = () => {
   const [title, setTitle] = useState(null);
   return (
     <div className="layout flex flex-col min-h-screen">
-      <NavBar className="header" title={title} />
+      <NavBar className="header" title={title || undefined} />
       <div className="body flex-grow p-4">
         <Outlet context={{ setTitle }} />
       </div>
