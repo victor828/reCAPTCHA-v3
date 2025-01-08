@@ -28,35 +28,32 @@ const Recaptcha = ({
     null
   );
 
-  sessionStorage.setItem("recapchaToken", recaptchaToken);
-
   useEffect(() => {
-    const fetchToken = () => {
-      load(recaptchaSiteKey).then((recaptcha) => {
-        recaptcha.execute(path).then(async (token) => {
-          setRecaptchaToken(token);
-          if (tokenExpiration) {
-            clearTimeout(tokenExpiration);
-          }
-          const expirationTimeout = setTimeout(() => {
-            setRecaptchaToken("");
-          }, expiration * 60 * 1000); // Token expira en 2 minutos por default
-          setTokenExpiration(expirationTimeout);
+    const fetchToken = async () => {
+      const recaptcha = await load(recaptchaSiteKey);
+      const token = await recaptcha.execute(path);
+      setRecaptchaToken(token);
+      sessionStorage.setItem("recapchaToken", token);
 
-          const response: RecaptchaResponse = await recaptchaService();
-          if (response.activateSecurity && onActivateSecurity) {
-            onActivateSecurity();
-          }
-          if (response.strongerRecaptcha) {
-            // Manejar el cambio a un tipo de reCAPTCHA más fuerte
-            load(recaptchaSiteKey).then((recaptcha) => {
-              recaptcha.execute("stronger_path").then((strongerToken) => {
-                setRecaptchaToken(strongerToken);
-              });
-            });
-          }
-        });
-      });
+      if (tokenExpiration) {
+        clearTimeout(tokenExpiration);
+      }
+      const expirationTimeout = setTimeout(() => {
+        setRecaptchaToken("");
+      }, expiration * 60 * 1000); // Token expira en 2 minutos por default
+      setTokenExpiration(expirationTimeout);
+
+      const response: RecaptchaResponse = await recaptchaService();
+      if (response.activateSecurity && onActivateSecurity) {
+        onActivateSecurity();
+      }
+      if (response.strongerRecaptcha) {
+        // Manejar el cambio a un tipo de reCAPTCHA más fuerte
+        const strongerRecaptcha = await load(recaptchaSiteKey);
+        const strongerToken = await strongerRecaptcha.execute("stronger_path");
+        setRecaptchaToken(strongerToken);
+        sessionStorage.setItem("recapchaToken", strongerToken);
+      }
     };
 
     fetchToken();
