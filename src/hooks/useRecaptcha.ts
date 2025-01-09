@@ -2,11 +2,22 @@ import { useEffect, useState, useCallback } from "react";
 import { load } from "recaptcha-v3";
 import { recaptchaSiteKey } from "../variables";
 
-const useRecaptcha = (path: string, dependencys: React.DependencyList = [], expiration: number = 2) => {
+
+type Badge = "bottomright" | "bottomleft" | "inline";
+
+const useRecaptcha = (
+    path: string, 
+    dependencys: React.DependencyList = [], 
+    expiration: number = 2,
+    hiden?: boolean, 
+    badge: Badge = "bottomright") => {
   const [tokenExpiration, setTokenExpiration] = useState<NodeJS.Timeout | null>(null);
 
   const fetchToken = useCallback(async () => {
-    const recaptcha = await load(recaptchaSiteKey, { useRecaptchaNet: true, renderParameters: { size: "invisible" } });
+    const recaptcha = await load(recaptchaSiteKey, { 
+        useRecaptchaNet: true, 
+        autoHideBadge:hiden, 
+        renderParameters: { size: "invisible", badge: badge } });
     const token = await recaptcha.execute(path);
     sessionStorage.setItem("recapchaToken", token);
 

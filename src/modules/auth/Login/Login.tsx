@@ -21,7 +21,7 @@ export function Login() {
 
   const [recaptcha, setrecaptcha] = useState(0);
 
-  useRecaptcha("login", [recaptcha]);
+  useRecaptcha("login", [recaptcha], 2, false, "bottomleft");
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

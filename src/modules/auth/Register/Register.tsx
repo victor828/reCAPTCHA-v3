@@ -1,7 +1,6 @@
 import image from "@assets/lofi-girl-reading-hip-hop-chillhop-uhdpaper.com-4K-7.2707.jpg";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import Recaptcha from "../../../components/Recaptcha";
 import CustomForm from "../../../components/CustomForm";
 import CustomCheckBox from "../../../components/CustomCheckBox";
 import { urlBase } from "../../../variables";
@@ -32,7 +31,7 @@ interface RecaptchaResponse {
 export function Register() {
   const navigate = useNavigate();
   const [newCaptcha, setnewCaptcha] = useState(0);
-  const { setUser, user } = useContext<any>(UsersContext);
+  const { setUser } = useContext(UsersContext);
   const [formData, setFormData] = useState({
     nombre: "",
     correo: "",
@@ -43,7 +42,7 @@ export function Register() {
     terms: false,
   });
 
-  useRecaptcha("register", [newCaptcha]);
+  useRecaptcha("register", [newCaptcha], 2, true);
 
   const handleSubmit = async (event: React.FormEvent<RegisterForm>) => {
     event.preventDefault();
@@ -173,16 +172,12 @@ export function Register() {
                 required
               />
               <CustomCheckBox
-                onchange={handleInputChange}
-                checked={formData.email_updates}
                 label="I want to receive emails about events, product updates and
                   company announcements."
                 name="email_updates"
                 id="email_updates"
               />
               <CustomCheckBox
-                onchange={handleInputChange}
-                checked={formData.terms}
                 required
                 label="I read & I accept the terms & conditions."
                 name="terms"
