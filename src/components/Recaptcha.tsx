@@ -19,7 +19,7 @@ const Recaptcha = ({
   );
 
   const fetchToken = useCallback(async () => {
-    const recaptcha = await load(recaptchaSiteKey);
+    const recaptcha = await load(recaptchaSiteKey, { useRecaptchaNet: true });
     const token = await recaptcha.execute(path);
     setRecaptchaToken(token);
     sessionStorage.setItem("recapchaToken", token);
@@ -29,7 +29,7 @@ const Recaptcha = ({
     }
     const expirationTimeout = setTimeout(() => {
       setRecaptchaToken("");
-    }, expiration * 60 * 1000); // Token expira en 2 minutos por default
+    }, expiration * 60 * 1000);
     setTokenExpiration(expirationTimeout);
   }, [path, expiration, tokenExpiration]);
 
@@ -40,17 +40,11 @@ const Recaptcha = ({
       if (tokenExpiration) {
         clearTimeout(tokenExpiration);
       }
+      sessionStorage.removeItem("recapchaToken");
     };
   }, [path, ...dependencys]);
 
-  return (
-    <input
-      className="visible"
-      type="hidden"
-      name="recaptchaToken"
-      value={recaptchaToken}
-    />
-  );
+  return <input type="hidden" name="recaptchaToken" value={recaptchaToken} />;
 };
 
 export default memo(Recaptcha);
