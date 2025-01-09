@@ -88,7 +88,9 @@ export function Register() {
     }));
     setUser((prevUser) => ({
       ...prevUser,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
+      nombre: prevUser?.nombre || "",
+      correo: prevUser?.correo || "",
     }));
   };
 
