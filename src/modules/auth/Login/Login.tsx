@@ -20,6 +20,7 @@ export function Login() {
   const { setUser } = useContext(UsersContext);
 
   const [recaptcha, setrecaptcha] = useState(0);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -53,7 +54,12 @@ export function Login() {
 
     if (result.token) {
       localStorage.setItem("token", result.token);
-      setUser(result.user);
+      if (result.user) {
+        setUser({
+          nombre: result.user.name,
+          correo: result.user.email,
+        });
+      }
       navigate("/");
     } else {
       alert(

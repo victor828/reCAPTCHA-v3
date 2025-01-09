@@ -1,4 +1,4 @@
-interface CustopCheckBox {
+interface CustomCheckBox {
   name: string;
   label: string;
   className?: string;
@@ -6,7 +6,7 @@ interface CustopCheckBox {
   id: string;
 }
 
-const CustopCheckBox = (props: CustopCheckBox) => {
+const CustomCheckBox = (props: CustomCheckBox) => {
   return (
     <div className="col-span-6">
       <label htmlFor={props.id} className={`flex gap-4 ${props.className}`}>
@@ -23,4 +23,4 @@ const CustopCheckBox = (props: CustopCheckBox) => {
   );
 };
 
-export default CustopCheckBox;
+export default CustomCheckBox;

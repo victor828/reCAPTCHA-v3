@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Recaptcha from "../../../components/Recaptcha";
 import CustomForm from "../../../components/CustomForm";
-import CustopCheckBox from "../../../components/CustopCheckBox";
+import CustomCheckBox from "../../../components/CustomCheckBox";
 import { urlBase } from "../../../variables";
 import { useContext, useState } from "react";
 import { recaptchaService } from "@/service/recaptcha.service";
@@ -26,19 +26,26 @@ interface RegisterForm extends HTMLFormElement {
 interface RecaptchaResponse {
   success: boolean;
   message?: string;
+  token?: string;
 }
 export function Register() {
   const navigate = useNavigate();
   const [newCaptcha, setnewCaptcha] = useState(0);
   const { setUser, user } = useContext<any>(UsersContext);
+  const [formData, setFormData] = useState({
+    nombre: "",
+    correo: "",
+    password: "",
+    password_confirmation: "",
+    fecha_nacimiento: "",
+    email_updates: false,
+    terms: false,
+  });
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<RegisterForm>) => {
     event.preventDefault();
-    const form = event.currentTarget as RegisterForm;
 
-    if (
-      form.elements.password.value !== form.elements.password_confirmation.value
-    ) {
+    if (formData.password !== formData.password_confirmation) {
       alert("Passwords do not match");
       return;
     }
@@ -52,11 +59,15 @@ export function Register() {
 
     const response = await fetch(urlBase + "auth/register", {
       method: "POST",
-      body: JSON.stringify(user),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
     });
 
     const result = await response.json();
-    if (result.success) {
+    if (result.token) {
+      localStorage.setItem("token", result.token);
       navigate("/");
     } else {
       alert(
@@ -68,7 +79,11 @@ export function Register() {
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
+    const { name, value, type, checked } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === "checkbox" ? checked : value,
+    }));
     setUser((prevUser) => ({
       ...prevUser,
       [name]: value,
@@ -117,14 +132,14 @@ export function Register() {
               <Recaptcha path="register" dependencys={[newCaptcha]} />
               <CustomForm
                 onchange={handleInputChange}
-                value={user.name}
+                value={formData.nombre}
                 label="Name"
                 name="nombre"
                 required
               />
               <CustomForm
                 onchange={handleInputChange}
-                value={user.email}
+                value={formData.correo}
                 label="Email"
                 name="correo"
                 type="email"
@@ -136,12 +151,12 @@ export function Register() {
                 label="Password"
                 name="password"
                 type="password"
-                value={user?.password}
+                value={formData.password}
                 required
               />
               <CustomForm
                 onchange={handleInputChange}
-                value={user?.password_confirmation}
+                value={formData.password_confirmation}
                 label="Password Confirmation"
                 name="password_confirmation"
                 type="password"
@@ -149,19 +164,23 @@ export function Register() {
               />
               <CustomForm
                 onchange={handleInputChange}
-                value={user?.born_day}
+                value={formData.fecha_nacimiento}
                 label="Born Day"
                 name="fecha_nacimiento"
                 type="date"
                 required
               />
-              <CustopCheckBox
+              <CustomCheckBox
+                onchange={handleInputChange}
+                checked={formData.email_updates}
                 label="I want to receive emails about events, product updates and
                   company announcements."
                 name="email_updates"
                 id="email_updates"
               />
-              <CustopCheckBox
+              <CustomCheckBox
+                onchange={handleInputChange}
+                checked={formData.terms}
                 required
                 label="I read & I accept the terms & conditions."
                 name="terms"

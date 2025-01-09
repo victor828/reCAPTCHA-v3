@@ -1,9 +1,9 @@
 import { createContext, useState } from "react";
 
 interface User {
-  name: string;
+  nombre: string;
 
-  email: string;
+  correo: string;
 
   [key: string]: string | number | boolean;
 }
@@ -13,7 +13,7 @@ interface UserContextType {
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
-const defaultUserContext = {
+const defaultUserContext: UserContextType = {
   user: null,
   setUser: () => {},
 };
@@ -27,11 +27,10 @@ interface UsersProviderProps {
 }
 
 export const UsersProvider = ({ children }: UsersProviderProps) => {
-  const [users, setUsers] = useState<User[]>([]);
   const [user, setUser] = useState<User | null>(null);
 
   return (
-    <UsersContext.Provider value={{ users, user, setUsers, setUser }}>
+    <UsersContext.Provider value={{ user, setUser }}>
       {children}
     </UsersContext.Provider>
   );

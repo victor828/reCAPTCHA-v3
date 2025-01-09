@@ -6,7 +6,7 @@ interface CustomFormProps {
   otherProps?: React.InputHTMLAttributes<HTMLInputElement>;
   required?: boolean;
   value?: string;
-  onchange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onchange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const CustomForm = (props: CustomFormProps) => {
