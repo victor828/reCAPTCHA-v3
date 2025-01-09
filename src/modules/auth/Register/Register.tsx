@@ -42,7 +42,7 @@ export function Register() {
     terms: false,
   });
 
-  useRecaptcha("register", [newCaptcha], 2, true);
+  useRecaptcha("register", [], 0.5, true);
 
   const handleSubmit = async (event: React.FormEvent<RegisterForm>) => {
     event.preventDefault();
@@ -54,7 +54,9 @@ export function Register() {
 
     const recaptchaData: RecaptchaResponse = await recaptchaService();
     if (!recaptchaData.success) {
-      alert("reCAPTCHA verification failed, press the button to recharge");
+      alert(
+        "reCAPTCHA verification failed, press the button to recharge the captcha and try again."
+      );
       setnewCaptcha((prev) => prev + 1);
       return;
     }
@@ -73,8 +75,10 @@ export function Register() {
       navigate("/");
     } else {
       alert(
-        `${result.message || "Error en la verificación de reCAPTCHA"}\n\n` +
-          "Por favor, recargue la página y vuelva a intentarlo."
+        `${
+          result.message ||
+          "reCAPTCHA verification failed, press the button to recharge the captcha and try again."
+        }`
       );
       setnewCaptcha((prev) => prev + 1);
     }
