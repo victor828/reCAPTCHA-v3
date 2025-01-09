@@ -1,11 +1,11 @@
 import React, { useContext, useState } from "react";
 import image from "@assets/lofi-girl-reading-hip-hop-chillhop-uhdpaper.com-4K-7.2707.jpg";
 import { Link, useNavigate } from "react-router-dom";
-import Recaptcha from "../../../components/Recaptcha";
 import CustomForm from "../../../components/CustomForm";
 import { recaptchaService } from "@/service/recaptcha.service";
 import { urlBase } from "../../../variables";
 import { UsersContext } from "../../../context/useContextUsers";
+import useRecaptcha from "../../../hooks/useRecaptcha";
 interface RecaptchaResponse {
   success: boolean;
   message?: string;
@@ -20,6 +20,8 @@ export function Login() {
   const { setUser } = useContext(UsersContext);
 
   const [recaptcha, setrecaptcha] = useState(0);
+
+  useRecaptcha("login", [recaptcha]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -118,11 +120,6 @@ export function Login() {
               onSubmit={handleSubmit}
               className="mt-8 grid grid-cols-6 gap-6"
             >
-              <Recaptcha
-                path="login"
-                expiration={0.5}
-                dependencys={[recaptcha]}
-              />
               <div className="grid gap-6 col-span-6 sm:col-span-3">
                 <CustomForm
                   label="Email"

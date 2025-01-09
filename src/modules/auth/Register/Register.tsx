@@ -8,6 +8,7 @@ import { urlBase } from "../../../variables";
 import { useContext, useState } from "react";
 import { recaptchaService } from "@/service/recaptcha.service";
 import { UsersContext } from "../../../context/useContextUsers";
+import useRecaptcha from "../../../hooks/useRecaptcha";
 
 interface FormElements extends HTMLFormControlsCollection {
   name: HTMLInputElement;
@@ -41,6 +42,8 @@ export function Register() {
     email_updates: false,
     terms: false,
   });
+
+  useRecaptcha("register", [newCaptcha]);
 
   const handleSubmit = async (event: React.FormEvent<RegisterForm>) => {
     event.preventDefault();
@@ -129,7 +132,6 @@ export function Register() {
               onSubmit={handleSubmit}
               className="mt-8 grid grid-cols-6 gap-6"
             >
-              <Recaptcha path="register" dependencys={[newCaptcha]} />
               <CustomForm
                 onchange={handleInputChange}
                 value={formData.nombre}
