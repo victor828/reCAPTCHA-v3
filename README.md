@@ -38,6 +38,10 @@ Asegúrate de tener una clave de sitio y una clave secreta de Google Recaptcha. 
 
 Las contribuciones son bienvenidas. Por favor, abre un issue o envía un pull request.
 
+## Es importante mencionar que la carpeta BackEnd solo contiene el documento de servicio
+
+Est4e documento lo pueden agregar a su backend
+
 ## Licencia
 
 Este proyecto está bajo la licencia MIT.
