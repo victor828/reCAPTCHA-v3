@@ -29,11 +29,12 @@ export const recaptchaService = async (params = {}) => {
       return { success: true, strongerRecaptcha: true };
     }
 
-    if (score >= 0.5) {
+    if (score >= 0.7) {
       // Puntuación suficiente para pasar la verificación
       return { success: true };
     } else {
       // Manejar puntuaciones bajas (posibles bots)
+      alert("Verificación adicional requerida ya que usted es un Boot");
       return {
         success: false,
         message: "Verificación adicional requerida",
