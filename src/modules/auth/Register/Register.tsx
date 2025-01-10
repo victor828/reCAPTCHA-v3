@@ -42,7 +42,7 @@ export function Register() {
     terms: false,
   });
 
-  useRecaptcha("register", [], 0.5, true);
+  useRecaptcha("register", [newCaptcha], 0.5, true);
 
   const handleSubmit = async (event: React.FormEvent<RegisterForm>) => {
     event.preventDefault();
