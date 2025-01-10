@@ -28,7 +28,7 @@ Este proyecto es una demostración de cómo integrar y utilizar Google Recaptcha
    ```bash
    npm run dev
    ```
-2. Abre tu navegador y navega a `http://localhost:3000`.
+2. Abre tu navegador y navega a `http://localhost:5173`.
 
 ## Configuración de Recaptcha
 
